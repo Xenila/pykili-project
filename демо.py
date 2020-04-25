@@ -86,9 +86,10 @@ for morph in morph_list: #список из списков [слово, приз
                 word_ant_dict[morph[0]] = ant_pair[1]
             break
 print(word_ant_dict)
-print(word_list)
+turnovers = []
 for word in word_list:
     if word in word_ant_dict:
-        print(word_ant_dict[word])
+        turnovers.append(word_ant_dict[word])
     else:
-        print(word)
+        turnovers.append(word)
+print(turnovers)
