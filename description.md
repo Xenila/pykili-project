@@ -20,7 +20,6 @@
 
 re  
 pymorphy2
-
 collections
 
 **Лингвистические данные**
