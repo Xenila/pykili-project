@@ -104,30 +104,20 @@ def verb(token, lem_dict, ant_pairs):
                 invl_ = w.tag.involvement
                 a = morph_an.parse(ant_pair[1])[0].inflect({num_, invl_}).word
                 return a
-'''
+
 def comparative(token, lem_dict, ant_pairs):
     morph_an = pymorphy2.MorphAnalyzer()
     w = morph_an.parse(token)[0]
+    pos_ = w.tag.POS
     for ant_pair in ant_pairs:
         if lem_dict[token] == ant_pair[0]:
-            a = morph_an.parse(ant_pair[1])[0].inflect({'COMP'}).word
+            a = morph_an.parse(ant_pair[1])[0].inflect({pos_}).word
             return a
 
-def replacing(dic, lines):
-    with open('new_file.txt', 'w', encoding = 'utf-8') as file:
-        for line in lines:
-            words = line.split()
-            for i in range(len(words)):
-                if words[i] in dic:
-                    words[i] = dic[words[i]]
-            file.write(' '.join(words) + '\n')        
-            lines2 = file.readlines()
-            return(lines2)
-'''
 def main():
     lines_ = cleaning('_слова.txt')
     lem_lines_ = opening('_леммы.txt')
-    ant_pairs_ = antonyms('_пары.txt')
+    ant_pairs_ = antonyms('антонимы.txt')
     lem_dict_ = dictionary(lines_, lem_lines_)  #словарь [слово]: нач. форма
     ant_pairs_ = antonyms('_пары.txt')   #список из списков [слово, антоним]
     word_list_ = list(lem_dict_)
@@ -140,8 +130,8 @@ def main():
             ant_changed_ = noun(word_, lem_dict_, ant_pairs_)
         elif sp_part_ == 'VERB':
             ant_changed_ = verb(word_, lem_dict_, ant_pairs_)
-        #elif sp_part_ == 'COMP':
-            #ant_changed_ = comparative(word_, lem_dict_, ant_pairs_)
+        elif sp_part_ == 'COMP':
+            ant_changed_ = comparative(word_, lem_dict_, ant_pairs_)
         else:
             for ant_pair_ in ant_pairs_:
                 if lem_dict_[word_] == ant_pair_[0]:
@@ -155,8 +145,8 @@ def main():
             for i in range(len(words_)):
                 if words_[i] in word_ant_dict_:
                     words_[i] = word_ant_dict_[words_[i]]
+            print(words_)
             file2_.write(' '.join(words_) + '\n')
-            
     
 if __name__ == '__main__':
     main()
