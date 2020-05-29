@@ -42,13 +42,14 @@ def antonyms(filename):
         ant_pairs = []
         for line in lines:
             ant_pair = line.split()
+            ant_pair[0] = ant_pair[0].lower()
             ant_pairs.append(ant_pair)
     return ant_pairs       
 
 def speech_part(word, ant_pairs, lem_dict):
     morph_an = pymorphy2.MorphAnalyzer()
     for ant_pair in ant_pairs:
-        if lem_dict[word].lower() == ant_pair[0].lower():
+        if lem_dict[word].lower() == ant_pair[0]:
             word_parse = morph_an.parse(word)[0]
             sp_part = word_parse.tag.POS
             return(sp_part)
@@ -60,7 +61,7 @@ def ajective(token, lem_dict, ant_pairs):
     num_ = w.tag.number
     case_ = w.tag.case
     for ant_pair in ant_pairs:
-        if lem_dict[token] == ant_pair[0]:
+        if lem_dict[token].lower() == ant_pair[0]:
             a = morph_an.parse(ant_pair[1])[0].inflect({num_, case_}).word
             if gen_:
                 a = morph_an.parse(a)[0].inflect({gen_}).word
@@ -72,7 +73,7 @@ def noun(token, lem_dict, ant_pairs):
     num_ = w.tag.number
     case_ = w.tag.case
     for ant_pair in ant_pairs:
-        if lem_dict[token] == ant_pair[0]:
+        if lem_dict[token].lower() == ant_pair[0]:
             a = morph_an.parse(ant_pair[1])[0].inflect({num_, case_}).word
             return a
 
@@ -81,7 +82,7 @@ def verb(token, lem_dict, ant_pairs):
     w = morph_an.parse(token)[0]
     mood_ = w.tag.mood
     for ant_pair in ant_pairs:
-        if lem_dict[token] == ant_pair[0]:
+        if lem_dict[token].lower() == ant_pair[0]:
             if mood_ == 'indc':
                 tense_ = w.tag.tense
                 if tense_ == 'pres' or tense_ == 'futr':
@@ -110,16 +111,15 @@ def comparative(token, lem_dict, ant_pairs):
     w = morph_an.parse(token)[0]
     pos_ = w.tag.POS
     for ant_pair in ant_pairs:
-        if lem_dict[token] == ant_pair[0]:
+        if lem_dict[token].lower() == ant_pair[0]:
             a = morph_an.parse(ant_pair[1])[0].inflect({pos_}).word
             return a
 
 def main():
-    lines_ = cleaning('_слова.txt')
-    lem_lines_ = opening('_леммы.txt')
-    ant_pairs_ = antonyms('антонимы.txt')
-    lem_dict_ = dictionary(lines_, lem_lines_)  #словарь [слово]: нач. форма
-    ant_pairs_ = antonyms('_пары.txt')   #список из списков [слово, антоним]
+    lines_ = cleaning('пословицы.txt')
+    lem_lines_ = opening('пословицы_леммы.txt')
+    ant_pairs_ = antonyms('антонимы.txt')   #список из списков [слово, антоним]
+    lem_dict_ = dictionary(lines_, lem_lines_)  #словарь [слово]: нач. форма 
     word_list_ = list(lem_dict_)
     ant_list_ = []
     for word_ in word_list_:
@@ -132,12 +132,12 @@ def main():
             ant_changed_ = verb(word_, lem_dict_, ant_pairs_)
         elif sp_part_ == 'COMP':
             ant_changed_ = comparative(word_, lem_dict_, ant_pairs_)
-        else:
+        elif sp_part_ == 'ADVB':
             for ant_pair_ in ant_pairs_:
-                if lem_dict_[word_] == ant_pair_[0]:
+                if lem_dict_[word_].lower() == ant_pair_[0]:
                     ant_changed_ = ant_pair_[1]
-        ant_list_.append(ant_changed_)
-    #print(ant_list_)    #список изменённых антонимов
+        else: ant_changed_ = word_
+        ant_list_.append(ant_changed_)  #список изменённых антонимов
     word_ant_dict_ = dict(zip(word_list_, ant_list_)) #слово: антоним (косв. ф.)
     with open('new_file.txt', 'w', encoding = 'utf-8') as file2_:
         for line_ in lines_:
@@ -147,6 +147,6 @@ def main():
                     words_[i] = word_ant_dict_[words_[i]]
             print(words_)
             file2_.write(' '.join(words_) + '\n')
-    
+           
 if __name__ == '__main__':
     main()
