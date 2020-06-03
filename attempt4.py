@@ -64,16 +64,22 @@ def adjective(token, lem_dict, ant_pairs):
     if pos_ == 'ADJF':
         case_ = w.tag.case
     for ant_pair in ant_pairs:
+        
         if lem_dict[token].lower() == ant_pair[0]:
-            a = morph_an.parse(ant_pair[1])[0].inflect({num_, pos_})
-            if a:
-                if w.tag.POS == 'ADJF':
-                    a = a.inflect({case_})
-                if gen_:
-                    a = a.inflect({gen_}).word
-                else:
-                    a = a.word
+            a = morph_an.parse(ant_pair[1])[0]
+            if a.tag.POS == 'NOUN':
+                a = a.inflect({num_, case_}).word
                 return a
+            else:
+                a = a.inflect({num_, pos_})
+                if a:
+                    if w.tag.POS == 'ADJF':
+                        a = a.inflect({case_})
+                    if gen_:
+                        a = a.inflect({gen_}).word
+                    else:
+                        a = a.word
+                    return a
 
 def pro_noun(token, lem_dict, ant_pairs):
     morph_an = pymorphy2.MorphAnalyzer()
@@ -83,10 +89,16 @@ def pro_noun(token, lem_dict, ant_pairs):
         num_ = w.tag.number
     for ant_pair in ant_pairs:
         if lem_dict[token].lower() == ant_pair[0]:
+            a = morph_an.parse(ant_pair[1])[0]
             if w.tag.POS == 'NOUN':
-                a = morph_an.parse(ant_pair[1])[0].inflect({num_, case_}).word
+                a = a.inflect({num_})
+                if a.tag.POS != 'VERB':
+                    a = a.inflect({case_}).word
+                else:
+                    invl_ = morph_an.parse('иди')[0].tag.involvement
+                    a = a.inflect({invl_}).word
             if w.tag.POS == 'NPRO':
-                a = morph_an.parse(ant_pair[1])[0].inflect({case_}).word
+                a = a.inflect({case_}).word
             return a
 
 def verb(token, lem_dict, ant_pairs):
@@ -145,8 +157,6 @@ def main():
             ant_changed_ = verb(word_, lem_dict_, ant_pairs_)
         elif sp_part_ == 'COMP':
             ant_changed_ = comparative(word_, lem_dict_, ant_pairs_)
-        #elif sp_part_ == 'NPRO':
-            #ant_changed_ = pronoun(word_, lem_dict_, ant_pairs_)
         elif sp_part_ == 'ADVB':
             for ant_pair_ in ant_pairs_:
                 if lem_dict_[word_].lower() == ant_pair_[0]:
