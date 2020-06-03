@@ -1,6 +1,7 @@
 import collections
 import re
 import pymorphy2
+import random
 morph_an = pymorphy2.MorphAnalyzer()
 
 def cleaning(filename):
@@ -139,7 +140,6 @@ def comparative(token, lem_dict, ant_pairs):
             a = morph_an.parse(ant_pair[1])[0].inflect({pos_}).word
             return a
 
-
 def main():
     lines_ = cleaning('_слова.txt')
     lem_lines_ = opening('output_леммы.txt')
@@ -157,7 +157,7 @@ def main():
             ant_changed_ = verb(word_, lem_dict_, ant_pairs_)
         elif sp_part_ == 'COMP':
             ant_changed_ = comparative(word_, lem_dict_, ant_pairs_)
-        elif sp_part_ == 'ADVB':
+        elif sp_part_ == 'ADVB' or sp_part_ == 'PRCL' or sp_part_ == 'INTJ':
             for ant_pair_ in ant_pairs_:
                 if lem_dict_[word_].lower() == ant_pair_[0]:
                     ant_changed_ = ant_pair_[1]
@@ -170,8 +170,22 @@ def main():
             for i in range(len(words_)):
                 if words_[i] in word_ant_dict_:
                     words_[i] = word_ant_dict_[words_[i]]
-            print(words_)
+            #print(words_)
             file2_.write(' '.join(words_) + '\n')
-           
+    with open('new_file.txt', encoding = 'utf-8') as file3_:
+        new_lines_ = file3_.readlines()
+    final_dict_ = dict(zip(new_lines_, lines_))
+    #print(final_dict_)
+
+    for i in range(0, 100):
+        quest = random.choice(list(final_dict_))
+        print(quest)
+        ans = input()
+        i += 1
+        if final_dict_[quest].lower() == ans.lower():
+            print('Ok')
+        else:
+            print(final_dict_[quest])
+
 if __name__ == '__main__':
     main()
