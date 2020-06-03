@@ -175,17 +175,16 @@ def main():
     with open('new_file.txt', encoding = 'utf-8') as file3_:
         new_lines_ = file3_.readlines()
     final_dict_ = dict(zip(new_lines_, lines_))
-    #print(final_dict_)
 
-    for i in range(0, 100):
+    while True:
         quest = random.choice(list(final_dict_))
         print(quest)
         ans = input()
-        i += 1
+        ans = ans + '\n'
         if final_dict_[quest].lower() == ans.lower():
-            print('Ok')
+            print('Да, это она!')
         else:
-            print(final_dict_[quest])
+            print('Нет, не угадали! Правильный ответ:' + '\n' + final_dict_[quest])
 
 if __name__ == '__main__':
     main()
